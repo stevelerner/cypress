@@ -117,13 +117,14 @@ services:
       - "3000:3000"
       - "3001:3001"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=test
       - REACT_APP_BACKEND_PORT=3001
+      - BACKEND_ENV=test
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
+      test: ["CMD", "sh", "-c", "wget -q --spider http://localhost:3000 && wget -q --spider http://localhost:3001/testData"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   cypress:
     build:
@@ -135,10 +136,9 @@ services:
         condition: service_healthy
     environment:
       - CYPRESS_baseUrl=http://app:3000
+      - CYPRESS_apiUrl=http://app:3001
       - CYPRESS_RECORD_KEY=${CYPRESS_RECORD_KEY}
       - CYPRESS_PROJECT_ID=${CYPRESS_PROJECT_ID}
-      - API_URL=http://app:3001
-      - BACKEND_ENV=test
     volumes:
       - ./cypress/videos:/e2e/cypress/videos
       - ./cypress/screenshots:/e2e/cypress/screenshots
