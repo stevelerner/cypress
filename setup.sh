@@ -94,6 +94,7 @@ RUN yarn install --frozen-lockfile
 COPY tsconfig.json tsconfig.tsnode.json ./
 COPY cypress.config.ts vite.cypress.config.ts vite.config.ts ./
 COPY cypress ./cypress
+COPY src ./src
 COPY backend ./backend
 COPY scripts ./scripts
 
