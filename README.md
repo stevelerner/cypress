@@ -8,9 +8,10 @@ This repository contains setup scripts and documentation to configure the Cypres
 
 This is a setup/configuration repository containing:
 - `setup.sh` - Automated setup script
+- `clean.sh` - Docker cleanup script
 - `README.md` - This documentation
 
-You will copy `setup.sh` into your fork of the Cypress Real World App repository to configure it.
+You will copy both scripts into your fork of the Cypress Real World App repository to configure it.
 
 ## Prerequisites
 
@@ -34,19 +35,22 @@ First, fork and clone the actual application repository (this is separate from t
 git clone https://github.com/YOUR_USERNAME/cypress-realworld-app.git
 ```
 
-### 2. Copy and Run Setup Script
+### 2. Copy Setup and Cleanup Scripts
 
-Copy the `setup.sh` file from this repository into your cloned cypress-realworld-app directory:
+Copy both scripts from this repository into your cloned cypress-realworld-app directory:
 
 ```bash
 # If both repositories are in /Volumes/external/code/
 cp /Volumes/external/code/cypress/setup.sh /Volumes/external/code/cypress-realworld-app/
+cp /Volumes/external/code/cypress/clean.sh /Volumes/external/code/cypress-realworld-app/
 
 # Navigate to your cypress-realworld-app directory
 cd /Volumes/external/code/cypress-realworld-app
 
-# Make the script executable and run it
-chmod +x setup.sh
+# Make scripts executable
+chmod +x setup.sh clean.sh
+
+# Run the setup script
 ./setup.sh
 ```
 
@@ -104,11 +108,21 @@ export default defineConfig({
 })
 ```
 
-### 5. Configure GitHub Secrets
+### 5. Configure GitHub Repository Secrets
 
-In your GitHub repository, go to Settings > Secrets and variables > Actions and add:
-- `CYPRESS_RECORD_KEY` - Your Cypress Cloud record key
-- `CYPRESS_PROJECT_ID` - Your Cypress Cloud project ID
+In your GitHub repository, go to Settings > Secrets and variables > Actions, then:
+
+1. Click the "Secrets" tab (not Variables)
+2. Click "New repository secret" button
+3. Add these two repository secrets:
+
+- Name: `CYPRESS_RECORD_KEY`
+  - Value: Your Cypress Cloud record key (sensitive authentication data)
+  
+- Name: `CYPRESS_PROJECT_ID`
+  - Value: Your Cypress Cloud project ID
+
+Note: Use **repository secrets**, not environment secrets. Repository secrets are accessible to all workflows in the repo, which is what we need for this setup.
 
 ## Usage
 
@@ -161,7 +175,7 @@ docker compose down
 ### Application Container
 
 Built from `Dockerfile.app`:
-- Node.js 20 Alpine base image
+- Node.js 22 Alpine base image
 - Installs dependencies with Yarn
 - Builds application
 - Exposes ports 3000 (frontend) and 3001 (backend)
@@ -170,7 +184,9 @@ Built from `Dockerfile.app`:
 ### Cypress Container
 
 Built from `Dockerfile.cypress`:
-- Cypress included image (version 13.6.0)
+- Node.js 22 base image (Debian-based for better compatibility)
+- Installs Cypress system dependencies
+- Installs Cypress via yarn/npm
 - Copies test files and configuration
 - Runs headless by default
 - Mounts volumes for videos and screenshots
@@ -245,6 +261,29 @@ Integrates with GitHub pull requests to display:
 - PR status checks
 
 ## Troubleshooting
+
+### Build fails or shows old Node version
+
+If you're getting Node version errors or stale builds:
+
+```bash
+# Run the cleanup script
+./clean.sh
+
+# Verify cleanup worked
+docker images | grep cypress-realworld-app
+# Should show nothing
+
+# Re-run setup
+./setup.sh
+
+# Verify Dockerfile has Node 22
+head -1 Dockerfile.cypress
+# Should show: FROM node:22
+
+# Build fresh
+docker compose build --no-cache
+```
 
 ### Docker Desktop not running
 

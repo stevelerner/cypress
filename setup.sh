@@ -51,7 +51,7 @@ echo ""
 # Create Dockerfiles
 echo "Creating Dockerfile.app..."
 cat > Dockerfile.app << 'EOF'
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
@@ -68,19 +68,38 @@ EOF
 
 echo "Creating Dockerfile.cypress..."
 cat > Dockerfile.cypress << 'EOF'
-FROM cypress/included:13.6.0
+FROM node:22
 
 WORKDIR /e2e
 
-COPY package.json yarn.lock cypress.config.ts ./
+# Install Cypress system dependencies
+RUN apt-get update && apt-get install -y \
+    libgtk2.0-0 \
+    libgtk-3-0 \
+    libgbm-dev \
+    libnotify-dev \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libxtst6 \
+    xauth \
+    xvfb \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy dependency files first for better caching
+COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
+# Copy all config files and source needed by Cypress
+COPY tsconfig.json tsconfig.tsnode.json ./
+COPY cypress.config.ts vite.cypress.config.ts vite.config.ts ./
 COPY cypress ./cypress
-COPY tsconfig.json ./
+COPY backend ./backend
+COPY scripts ./scripts
 
 ENV CI=true
 
-CMD ["cypress", "run"]
+CMD ["npx", "cypress", "run"]
 EOF
 
 echo "Creating docker-compose.yml..."
