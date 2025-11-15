@@ -17,7 +17,7 @@ rm -f Dockerfile.app docker-compose.yml
 
 echo "Creating Dockerfile.app..."
 cat > Dockerfile.app << 'EOF'
-FROM node:20-alpine
+FROM node:20
 
 WORKDIR /app
 
@@ -27,6 +27,9 @@ RUN yarn install --frozen-lockfile
 COPY . .
 
 EXPOSE 3000 3001
+
+# Override start:react to use --host flag for Docker
+RUN sed -i 's/"start:react": "vite"/"start:react": "vite --host"/' package.json
 
 CMD ["yarn", "start"]
 EOF
@@ -41,6 +44,8 @@ services:
     ports:
       - "3000:3000"
       - "3001:3001"
+    environment:
+      - VITE_HOST=0.0.0.0
 EOF
 
 echo ""
