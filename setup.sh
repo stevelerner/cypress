@@ -137,6 +137,8 @@ services:
       - CYPRESS_baseUrl=http://app:3000
       - CYPRESS_RECORD_KEY=${CYPRESS_RECORD_KEY}
       - CYPRESS_PROJECT_ID=${CYPRESS_PROJECT_ID}
+      - API_URL=http://app:3001
+      - BACKEND_ENV=test
     volumes:
       - ./cypress/videos:/e2e/cypress/videos
       - ./cypress/screenshots:/e2e/cypress/screenshots
