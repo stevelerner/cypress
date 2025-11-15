@@ -31,6 +31,10 @@ EXPOSE 3000 3001
 # Override start:react to use --host flag for Docker
 RUN sed -i 's/"start:react": "vite"/"start:react": "vite --host"/' package.json
 
+# Add 'app' to vite.config.ts allowedHosts
+RUN sed -i '/server: {/a\    allowedHosts: [".app", "app", "localhost"],' vite.config.ts || \
+    sed -i 's/export default defineConfig({/export default defineConfig({\n  server: { allowedHosts: [".app", "app", "localhost"] },/' vite.config.ts
+
 CMD ["yarn", "start"]
 EOF
 
