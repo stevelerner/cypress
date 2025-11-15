@@ -2,6 +2,16 @@
 
 Docker-based setup for demonstrating Cypress Cloud features including Recorded Runs, Test Replay, and Branch Review using the Cypress Real World App.
 
+This repository contains setup scripts and documentation to configure the Cypress Real World App with Docker and Cypress Cloud integration.
+
+## Repository Structure
+
+This is a setup/configuration repository containing:
+- `setup.sh` - Automated setup script
+- `README.md` - This documentation
+
+You will copy `setup.sh` into your fork of the Cypress Real World App repository to configure it.
+
 ## Prerequisites
 
 - macOS (tested on Ventura 13.0+)
@@ -14,22 +24,33 @@ Note: This setup is specifically designed for macOS with Docker Desktop for Mac.
 
 ## Setup
 
-### 1. Fork and Clone Repository
+### 1. Fork and Clone the Cypress Real World App
+
+First, fork and clone the actual application repository (this is separate from this setup repository):
 
 ```bash
-# Fork https://github.com/cypress-io/cypress-realworld-app
+# Fork https://github.com/cypress-io/cypress-realworld-app on GitHub
+# Then clone your fork
 git clone https://github.com/YOUR_USERNAME/cypress-realworld-app.git
-cd cypress-realworld-app
 ```
 
-### 2. Run Setup Script
+### 2. Copy and Run Setup Script
 
-Make the script executable and run it:
+Copy the `setup.sh` file from this repository into your cloned cypress-realworld-app directory:
 
 ```bash
+# If both repositories are in /Volumes/external/code/
+cp /Volumes/external/code/cypress/setup.sh /Volumes/external/code/cypress-realworld-app/
+
+# Navigate to your cypress-realworld-app directory
+cd /Volumes/external/code/cypress-realworld-app
+
+# Make the script executable and run it
 chmod +x setup.sh
 ./setup.sh
 ```
+
+Adjust the paths above based on where you cloned both repositories.
 
 This creates:
 - Docker configuration files
